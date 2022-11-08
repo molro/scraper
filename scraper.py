@@ -1,4 +1,3 @@
- necesario installar
 # Beautifulsoup4 python3 -m pip install beautifulsoup4
 # Selenium python3 -m pip install selenium
 
