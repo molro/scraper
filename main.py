@@ -1,7 +1,10 @@
-from abc import abstractmethod 
+
 from bs4 import BeautifulSoup
 from selenium import webdriver
+
 import csv
+
+from constants import constants as c
 
 def to_drive (url):
     url_to_scrap = url
@@ -11,7 +14,7 @@ def to_drive (url):
     driver.close()
     return html 
 
-def scraping(url):
+def to_scrap(url):
     html = to_drive(url)
     soup = BeautifulSoup(html, "html.parser")
     total_elements = soup.find_all("div",{"class":"countResults"})[0].string
@@ -20,13 +23,13 @@ def scraping(url):
     return products_page
 
 def to_csv(url):
-    products_page = scraping(url)
+    products_page = to_scrap(url)
 
     with open('Sears_page1.csv', 'w', newline='') as csvfile:
         productwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         productwriter.writerow(['Description','price','img_url']) ## Refactorizar 
         for product in products_page:
-            productwriter.writerow([product.find('p', {'class':'h4'}).text, product.find('p', {'class':'precio1'}).text, product.find('img')['src']])
+            productwriter.writerow([product.find('p', {'class':'h4'}).text, product.find('p', {'class':'precio1'}).text, product.find('img')['src']]) ### Escalar
     
     print(len(products_page))
 
@@ -45,7 +48,7 @@ if __name__ == "__main__":
         if (option<1 or option>2):
             print("Invalid option, try again")
         elif (option==1):
-            to_csv("https://www.sears.com.mx/categoria/15466/televisiones/pagina=1")
+            to_csv(c.SEARS_URL)
         elif (option==2):
             print("Goodbye!")
             end=True
