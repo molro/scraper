@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 import csv
 
-def to_drive (url):
+def get_html (url):
     url_to_scrap = url
     driver = webdriver.Firefox()
     driver.get(url_to_scrap)
@@ -12,23 +12,28 @@ def to_drive (url):
     return html 
 
 def scraping(url):
-    html = to_drive(url)
+    html = get_html(url)
     soup = BeautifulSoup(html, "html.parser")
-    total_elements = soup.find_all("div",{"class":"countResults"})[0].string
-    print("Cantidad de elementos: " + total_elements)
-    products_page = soup.find('div',{'class':'boxProductosCategory'}).find_all('article')
-    return products_page
+    # get total elements of the category
+    category_total = soup.find_all("div",{"class":"countResults"})[0].string
+    print("Cantidad de elementos de la categoria: " + category_total)
+
+    article_list = soup.find('div',{'class':'boxProductosCategory'}).find_all('article')
+    return article_list
 
 def to_csv(url):
-    products_page = scraping(url)
+    article_list = scraping(url)
 
     with open('Sears_page1.csv', 'w', newline='') as csvfile:
-        productwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        productwriter.writerow(['Description','price','img_url']) ## Refactorizar 
-        for product in products_page:
-            productwriter.writerow([product.find('p', {'class':'h4'}).text, product.find('p', {'class':'precio1'}).text, product.find('img')['src']])
+        article_writer = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        article_writer.writerow(['description','price','img_url']) ## Refactorizar 
+        for article in article_list:
+            article_description = article.find('p', {'class':'h4'}).text
+            article_price = article.find('p', {'class':'precio1'}).text
+            article_img_url = article.find('img')['src']
+            article_writer.writerow([article_description, article_price, article_img_url])
     
-    print(len(products_page))
+    print("Cantidad de elementos escritos en el csv: " + str(len(article_list)))
 
 if __name__ == "__main__":
     end=False
